@@ -2,18 +2,14 @@ import asyncio
 import logging
 import sys
 
-from aiogram import Bot, Dispatcher, html
+from aiogram import Bot, html
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.types import Message
 
 from keyboards.keyboards import employee_menu_keyboard
-from system.system import BOT_TOKEN
-
-# All handlers should be attached to the Router (or Dispatcher)
-
-dp = Dispatcher()
+from system.system import BOT_TOKEN, dp
 
 
 @dp.message(CommandStart())
@@ -24,26 +20,11 @@ async def command_start_handler(message: Message) -> None:
     await message.answer(f"Hello, {html.bold(message.from_user.full_name)}!", reply_markup=employee_menu_keyboard())
 
 
-@dp.message()
-async def echo_handler(message: Message) -> None:
-    """
-    Handler will forward receive a message back to the sender
-
-    By default, message handler will handle all message types (like a text, photo, sticker etc.)
-    """
-    try:
-        # Send a copy of the received message
-        await message.send_copy(chat_id=message.chat.id)
-    except TypeError:
-        # But not all the types is supported to be copied so need to handle it
-        await message.answer("Nice try!")
-
-
 async def main() -> None:
-    # Initialize Bot instance with default bot properties which will be passed to all API calls
+    # Инициализируйте экземпляр бота свойствами бота по умолчанию, которые будут передаваться во все вызовы API
     bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
-    # And the run events dispatching
+    # И диспетчеризация событий запуска
     await dp.start_polling(bot)
 
 
