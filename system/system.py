@@ -8,7 +8,7 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from dotenv import load_dotenv
 
-TARGET_USER_ID = [535185511, 301634256]  # список ID админов
+TARGET_USER_ID = [535185511]  # список ID админов
 
 load_dotenv()  # Загружаем переменные окружения из .env
 

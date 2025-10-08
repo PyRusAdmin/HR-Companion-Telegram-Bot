@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import asyncio
 import logging
 import sys
@@ -10,11 +11,9 @@ from system.system import dp, bot
 async def main() -> None:
     # И диспетчеризация событий запуска
 
-    await dp.start_polling(bot)
-
     register_handler()  # Регистрация обработчиков событий
     register_greeting_handler()  # Регистрация обработчиков событий
-
+    await dp.start_polling(bot)
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
