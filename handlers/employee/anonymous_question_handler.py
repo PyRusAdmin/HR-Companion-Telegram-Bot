@@ -6,7 +6,7 @@ from keyboards.keyboards import back
 from system.system import router
 
 
-@router.callback_query(F.data == "registration")
+@router.callback_query(F.data == "anonymous_question_handler")
 async def anonymous_question_handler(query: CallbackQuery) -> None:
     """❓ Анонимный вопрос"""
 
