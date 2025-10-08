@@ -10,10 +10,11 @@ from system.system import dp, bot
 
 async def main() -> None:
     # И диспетчеризация событий запуска
-
-    register_handler()  # Регистрация обработчиков событий
     register_greeting_handler()  # Регистрация обработчиков событий
+    register_handler()  # Регистрация обработчиков событий
+
     await dp.start_polling(bot)
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)

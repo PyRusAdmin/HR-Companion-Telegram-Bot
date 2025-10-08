@@ -6,10 +6,10 @@ from loguru import logger
 
 from database.database import save_bot_user, is_user_exists, is_user_status
 from keyboards.keyboards import employee_menu_keyboard, register_keyboard
-from system.system import router, bot
+from system.system import router, bot, dp
 
 
-@router.message(CommandStart())
+@dp.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
     """Отвечает на команду /start"""
     logger.info(f"Пользователь {message.from_user.id} {message.from_user.username} начал работу с ботом")
