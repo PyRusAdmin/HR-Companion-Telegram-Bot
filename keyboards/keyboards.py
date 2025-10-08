@@ -38,7 +38,6 @@ def employee_menu_keyboard() -> InlineKeyboardMarkup | None:
         return None
 
 
-
 def hr_menu_keyboard() -> InlineKeyboardMarkup | None:
     """Клавиатура для Меню HR"""
     logger.info("Запущена клавиатура для сотрудника")
