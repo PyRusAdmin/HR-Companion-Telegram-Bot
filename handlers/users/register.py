@@ -5,10 +5,10 @@ from loguru import logger
 
 from database.database import write_database
 from keyboards.keyboards import back, confirmation_keyboard
-from system.system import router, TARGET_USER_ID, bot
+from system.system import TARGET_USER_ID, bot, router
 
 
-@router.callback_query(F.data == "register")
+@router.callback_query(F.data == "registration")
 async def callback_register_handler(query: CallbackQuery) -> None:
     """Регистрация пользователя"""
     logger.debug(
