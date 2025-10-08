@@ -9,6 +9,7 @@ from handlers.employee.faq_handler import register_handlers_faq_handler
 from handlers.employee.news_handler import register_handlers_news_handler
 from handlers.hr.add_employee_handler import register_handlers_add_employee_handler
 from handlers.hr.delete_employee_handler import register_handlers_delete_employee_handler
+from handlers.hr.incoming_questions_handler import register_handlers_publish_advertisement_handler
 from handlers.users.greeting import register_greeting_handler
 from handlers.users.register import register_handler
 from system.system import dp, bot
@@ -29,6 +30,7 @@ async def main() -> None:
     # Регистрация обработчиков событий для HR
     register_handlers_add_employee_handler()  # Регистрация обработчиков событий 👤 Добавить сотрудника
     register_handlers_delete_employee_handler()  # Регистрация обработчиков событий 🚪 Удалить сотрудника
+    register_handlers_publish_advertisement_handler()  # Регистрация обработчиков событий ✍ Публикация объявления
 
     await dp.start_polling(bot)
 
