@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 from loguru import logger
-from peewee import SqliteDatabase, Model, IntegerField, TextField, DateTimeField, FloatField, CharField
+from peewee import SqliteDatabase, Model, IntegerField, TextField, CharField
 
 # Подключение к БД
 db = SqliteDatabase("database/people.db")
 
 
 class Users(Model):
+    """
+    Модель для хранения данных пользователей.
+    """
     id_user = IntegerField(unique=True)  # ID пользователя
     user_name = TextField(null=True)  # Username пользователя
     last_name = TextField(null=True)  # Фамилия пользователя
@@ -16,19 +19,6 @@ class Users(Model):
     class Meta:
         database = db
         table_name = "users"
-
-
-class Transactions(Model):
-    transaction_id = TextField(primary_key=True)  # Уникальный ID транзакции
-    time = DateTimeField()  # Время транзакции
-    amount = FloatField()  # Сумма транзакции
-    symbol = TextField()  # Валюта
-    from_transaction = TextField()  # Откуда
-    to_transaction = TextField()  # Куда
-
-    class Meta:
-        database = db
-        table_name = "transactions"
 
 
 class BotUsers(Model):
@@ -50,7 +40,7 @@ class BotUsers(Model):
 
 # Создаём таблицу при загрузке модуля
 db.connect()
-db.create_tables([Users, Transactions, BotUsers], safe=True)
+db.create_tables([Users, BotUsers], safe=True)
 db.close()
 
 
@@ -96,13 +86,6 @@ async def save_bot_user(message):
         logger.info(f"❌ Ошибка при сохранении пользователя: {e}")
 
 
-async def read_from_db():
-    """Функция для чтения данных из базы данных. Считываем данные из базы данных"""
-    with db:
-        rows = Transactions.select()  # Получаем все записи из таблицы employees
-    return rows
-
-
 def write_database(id_user, user_name, last_name, first_name, status):
     """Сохраняем или обновляем данные пользователя"""
     try:
@@ -128,15 +111,6 @@ def write_database(id_user, user_name, last_name, first_name, status):
         )
     except Exception as e:
         logger.error(f"Ошибка записи в базу: {e}")
-
-
-def transaction_exists(tx_id: str) -> bool:
-    """Проверяет, существует ли транзакция с таким ID в БД"""
-    try:
-        return Transactions.select().where(Transactions.transaction_id == tx_id).exists()
-    except Exception as e:
-        logger.error(f"Ошибка при проверке транзакции {tx_id}: {e}")
-        return False
 
 
 def is_user_exists(id_user: int) -> bool:
