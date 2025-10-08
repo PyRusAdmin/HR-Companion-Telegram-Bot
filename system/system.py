@@ -1,7 +1,14 @@
+# -*- coding: utf-8 -*-
 import os
 
+from aiogram import Bot
 from aiogram import Dispatcher
+from aiogram import Router
+from aiogram.client.default import DefaultBotProperties
+from aiogram.enums import ParseMode
 from dotenv import load_dotenv
+
+TARGET_USER_ID = [535185511, 301634256]  # список ID админов
 
 load_dotenv()  # Загружаем переменные окружения из .env
 
@@ -9,3 +16,9 @@ load_dotenv()  # Загружаем переменные окружения из
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
 
 dp = Dispatcher()
+
+# Создаём роутер
+router = Router()
+
+# Инициализируйте экземпляр бота свойствами бота по умолчанию, которые будут передаваться во все вызовы API
+bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))

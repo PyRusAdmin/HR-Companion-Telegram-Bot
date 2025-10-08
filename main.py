@@ -2,14 +2,13 @@ import asyncio
 import logging
 import sys
 
-from aiogram import Bot, html
-from aiogram.client.default import DefaultBotProperties
-from aiogram.enums import ParseMode
+from aiogram import html
 from aiogram.filters import CommandStart
 from aiogram.types import Message
 from loguru import logger
+
 from keyboards.keyboards import employee_menu_keyboard
-from system.system import BOT_TOKEN, dp
+from system.system import dp, bot
 
 
 @dp.message(CommandStart())
@@ -24,16 +23,14 @@ async def command_start_handler(message: Message) -> None:
     first_name = message.from_user.first_name  # имя пользователя
     last_name = message.from_user.last_name  # фамилия пользователя
 
-    logger.info(f"Пользователь c id {id_user} username {username} first_name {first_name} last_name {last_name} отправил команду /start")
+    logger.info(
+        f"Пользователь c id {id_user} username {username} first_name {first_name} last_name {last_name} отправил команду /start")
 
     # Отправляем приветственное сообщение пользователю
     await message.answer(f"Hello, {html.bold(message.from_user.full_name)}!", reply_markup=employee_menu_keyboard())
 
 
 async def main() -> None:
-    # Инициализируйте экземпляр бота свойствами бота по умолчанию, которые будут передаваться во все вызовы API
-    bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-
     # И диспетчеризация событий запуска
     await dp.start_polling(bot)
 
