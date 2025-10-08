@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from aiogram import F
 from aiogram.types import CallbackQuery
-from database.database import read_from_db, write_database
 from loguru import logger
 
+from database.database import write_database
 from keyboards.keyboards import back, confirmation_keyboard
 from system.system import router, TARGET_USER_ID, bot
 

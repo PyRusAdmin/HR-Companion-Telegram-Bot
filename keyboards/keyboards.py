@@ -1,5 +1,45 @@
+# -*- coding: utf-8 -*-
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from loguru import logger
+
+
+def register_keyboard():
+    """Клавиатура для регистрации"""
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="Регистрация",
+                                  callback_data="registration")],
+        ]
+    )
+
+
+def back():
+    """Клавиатура для возврата"""
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="Главное меню", callback_data="back")
+
+            ]
+        ]
+    )
+
+
+def confirmation_keyboard(user_id: int):
+    """Клавиатура для подтверждения регистрации"""
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="Подтвердить", callback_data=f"confirm:{user_id}"
+                ),
+                InlineKeyboardButton(
+                    text="Отклонить", callback_data=f"reject:{user_id}"
+                )
+            ]
+        ]
+    )
 
 
 def employee_menu_keyboard() -> InlineKeyboardMarkup | None:
