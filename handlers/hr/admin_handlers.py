@@ -23,10 +23,10 @@ async def admin_send_start(message: types.Message, state: FSMContext):
                          "<b>Редактирование текста и отправка сообщений:</b>\n\n"
 
                          "<b>Редактирование текста:</b>\n"
-                         "/edit_types_of_packaging - ❓ Анонимный вопрос\n"
-                         "/edit_services_and_prices - 📖 Справочник\n"
-                         "/edit_wooden_corners_bag_tape - 🔍 FAQ\n"
-                         "/edit_wooden_sheathing_bag_tape - 📢 Новости и акции\n"
+                         "/edit_anonymous_question_handler - ❓ Анонимный вопрос\n"
+                         "/edit_dictionary_handler - 📖 Справочник\n"
+                         "/edit_faq_handler - 🔍 FAQ\n"
+                         "/edit_news_handler - 📢 Новости и акции\n"
 
                          "<b>Получение данных:</b>\n"
                          "/get_a_list_of_users_registered_in_the_bot - Получение списка зарегистрированных "
