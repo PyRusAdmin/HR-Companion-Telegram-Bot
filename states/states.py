@@ -7,3 +7,4 @@ class BotContentEditStates(StatesGroup):
     edit_anonymous_question_handler = State()  # Замена текста в разделе "❓ Анонимный вопрос"
     edit_dictionary_handler = State()  # Замена текста в разделе "📖 Справочник"
     edit_faq_handler = State()  # Замена текста в разделе "🔍 FAQ"
+    edit_news_handler = State()  # Замена текста в разделе "📢 Новости и акции"
