@@ -17,10 +17,8 @@ BOT_TOKEN = os.environ.get("BOT_TOKEN")
 
 dp = Dispatcher()
 
-
 # Инициализируйте экземпляр бота свойствами бота по умолчанию, которые будут передаваться во все вызовы API
 bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-
 
 # Создаём роутер
 router = Router()
