@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 from aiogram import F
-from aiogram.types import CallbackQuery
-from aiogram import F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
@@ -12,8 +10,6 @@ from states.states import BotContentEditStates
 from system.system import ADMIN_USER_ID
 from system.system import router
 from system.working_with_files import load_bot_info, save_bot_info
-from keyboards.keyboards import back
-from system.system import router
 
 
 @router.callback_query(F.data == "news_handler")
