@@ -35,7 +35,7 @@ async def edit_faq_handler(message: Message, state: FSMContext):
 
 
 @router.message(BotContentEditStates.edit_faq_handler)
-async def update_payment_info(message: Message, state: FSMContext):
+async def update_faq_handler(message: Message, state: FSMContext):
     """Обработчик текстовых сообщений (для админа, чтобы обновить информацию)"""
     save_bot_info(
         message.html_text, file_path='media/messages/faq_handler.json'

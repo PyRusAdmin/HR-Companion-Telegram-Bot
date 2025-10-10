@@ -36,7 +36,7 @@ async def edit_dictionary_handler(message: Message, state: FSMContext):
 
 
 @router.message(BotContentEditStates.edit_dictionary_handler)
-async def update_payment_info(message: Message, state: FSMContext):
+async def update_dictionary_handler(message: Message, state: FSMContext):
     """Обработчик текстовых сообщений (для админа, чтобы обновить информацию)"""
     save_bot_info(
         message.html_text, file_path='media/messages/dictionary_handler.json'
