@@ -26,7 +26,7 @@ async def admin_send_start(message: types.Message, state: FSMContext):
                          "/edit_anonymous_question_handler - ❓ Анонимный вопрос\n"
                          "/edit_dictionary_handler - 📖 Справочник\n"
                          "/edit_faq_handler - 🔍 FAQ\n"
-                         "/edit_news_handler - 📢 Новости и акции\n"
+                         "/edit_news_handler - 📢 Новости и акции\n\n"
 
                          "<b>Получение данных:</b>\n"
                          "/get_a_list_of_users_registered_in_the_bot - Получение списка зарегистрированных "
