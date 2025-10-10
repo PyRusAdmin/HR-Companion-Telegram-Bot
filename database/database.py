@@ -21,6 +21,20 @@ class Users(Model):
         table_name = "users"
 
 
+def get_users():
+    """Получаем всех пользователей, зарегистрированных в базе данных."""
+    datas = []
+    for data in Users.select():
+        datas.append([
+            data.id_user,
+            data.user_name or "",
+            data.last_name or "",
+            data.first_name or "",
+            data.status or "",
+        ])
+    return datas
+
+
 class BotUsers(Model):
     """
     Таблица пользователей, которые запускали бота.
@@ -36,6 +50,25 @@ class BotUsers(Model):
     class Meta:
         database = db
         table_name = "bot_users"
+
+
+def get_user_bot_users():
+    """
+    Получаем всех пользователей, запустивших бота.
+    Возвращаем список списков (для удобства записи в Excel).
+    """
+    datas = []
+    for data in BotUsers.select():
+        datas.append([
+            data.user_id,
+            data.username or "",
+            data.first_name or "",
+            data.last_name or "",
+            data.chat_type or "",
+            data.language_code or "",
+            data.date_start or ""
+        ])
+    return datas
 
 
 # Создаём таблицу при загрузке модуля

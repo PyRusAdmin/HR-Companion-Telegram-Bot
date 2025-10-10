@@ -7,6 +7,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import FSInputFile
 from loguru import logger
 
+from database.database import get_user_bot_users, get_users
 from system.system import router, bot, ADMIN_USER_ID
 
 
@@ -37,66 +38,95 @@ async def admin_send_start(message: types.Message, state: FSMContext):
 
 
 # Функция для создания файла Excel с данными заказов
-def create_excel_file(orders):
+def create_excel_file(users):
+    """
+    Создание Excel файла с данными пользователей из таблицы Users.
+    """
     workbook = openpyxl.Workbook()
     sheet = workbook.active
+    sheet.title = "Пользователи"
+
     # Заголовки столбцов
-    sheet['A1'] = 'ID аккаунта пользователя'
-    sheet['B1'] = 'Имя'
-    sheet['C1'] = 'Фамилия'
-    sheet['D1'] = 'Город'
-    sheet['E1'] = 'Номер телефона'
-    sheet['F1'] = 'Дата регистрации'
-    # Заполнение данными заказов
-    for index, order in enumerate(orders, start=2):
-        sheet.cell(row=index, column=1).value = order[0]  # ID аккаунта пользователя
-        sheet.cell(row=index, column=2).value = order[1]  # Имя
-        sheet.cell(row=index, column=3).value = order[2]  # Фамилия
-        sheet.cell(row=index, column=4).value = order[3]  # Город
-        sheet.cell(row=index, column=5).value = order[4]  # Номер телефона
-        sheet.cell(row=index, column=6).value = order[5]  # Дата регистрации
+    headers = [
+        'ID аккаунта пользователя',
+        'Username',
+        'Имя',
+        'Фамилия',
+        'Статус (доступ разрешён)'
+    ]
+    sheet.append(headers)
+
+    # Заполнение данными
+    for user in users:
+        sheet.append(user)
+
+    # Автоматическая ширина столбцов
+    for column_cells in sheet.columns:
+        length = max(len(str(cell.value or "")) for cell in column_cells)
+        sheet.column_dimensions[column_cells[0].column_letter].width = length + 2
 
     return workbook
 
 
 @router.message(Command('get_a_list_of_users_registered_in_the_bot'))
 async def export_data(message: types.Message, state: FSMContext):
-    """Получение списка зарегистрированных пользователей"""
-    await state.clear()  # Завершаем текущее состояние машины состояний
+    """Получение списка зарегистрированных пользователей"""
+    await state.clear()
     try:
-        if message.from_user.id not in [535185511, 301634256]:
+        # Проверка прав администратора
+        if message.from_user.id not in [535185511, 5429188565]:
             await message.reply('У вас нет доступа к этой команде.')
             return
+
+        users = get_users()
+
+        if not users:
+            await message.reply("⚠️ В базе нет зарегистрированных пользователей.")
+            return
+
         # Создание файла Excel
-        workbook = create_excel_file(reading_from_database())
+        workbook = create_excel_file(users)
         filename = 'Зарегистрированные пользователи в боте.xlsx'
-        workbook.save(filename)  # Сохранение файла
-        await bot.send_document(message.from_user.id,
-                                document=FSInputFile(filename),
-                                caption=("Данные пользователей зарегистрированных в боте\n\n"
-                                         "Для возврата в начальное меню нажми на /start или /help")
-                                )  # Отправка файла пользователю
-        os.remove(filename)  # Удаление файла
+        workbook.save(filename)
+
+        # Отправка файла
+        await message.answer_document(
+            document=FSInputFile(filename),
+            caption=("📋 Данные пользователей, зарегистрированных в боте\n\n"
+                     "Для возврата в начальное меню нажми /start или /help")
+        )
+
+        # Удаляем файл после отправки
+        os.remove(filename)
+
     except Exception as e:
-        logger.error(e)
+        logger.exception(f"Ошибка при экспорте пользователей: {e}")
+        await message.reply("❌ Произошла ошибка при создании отчета.")
 
 
-def create_excel_file_start(orders):
+def create_excel_file_start(users):
+    """
+    Создание Excel файла с данными пользователей, запустивших бота.
+    """
     workbook = openpyxl.Workbook()
     sheet = workbook.active
+    sheet.title = "Пользователи"
+
     # Заголовки столбцов
-    sheet['A1'] = 'ID аккаунта пользователя'
-    sheet['B1'] = 'username'
-    sheet['C1'] = 'Имя'
-    sheet['D1'] = 'Фамилия'
-    sheet['E1'] = 'Дата запуска бота'
-    # Заполнение данными заказов
-    for index, order in enumerate(orders, start=2):
-        sheet.cell(row=index, column=1).value = order[0]  # ID аккаунта пользователя
-        sheet.cell(row=index, column=2).value = order[1]  # username
-        sheet.cell(row=index, column=3).value = order[2]  # Имя
-        sheet.cell(row=index, column=4).value = order[3]  # Фамилия
-        sheet.cell(row=index, column=5).value = order[4]  # Дата запуска бота
+    headers = [
+        'ID аккаунта пользователя',
+        'username',
+        'Имя',
+        'Фамилия',
+        'Тип чата',
+        'Язык Telegram',
+        'Дата запуска бота'
+    ]
+    sheet.append(headers)
+
+    # Заполнение данными
+    for user in users:
+        sheet.append(user)
 
     return workbook
 
@@ -106,10 +136,10 @@ async def get_users_who_launched_the_bot(message: types.Message, state: FSMConte
     """Получение данных пользователей, запускающих бота"""
     await state.clear()  # Завершаем текущее состояние машины состояний
     try:
-        if message.from_user.id not in [535185511, 301634256]:
+        if message.from_user.id not in [535185511, 5429188565]:
             await message.reply('У вас нет доступа к этой команде.')
             return
-        workbook = create_excel_file_start(reading_from_database())  # Создание файла Excel
+        workbook = create_excel_file_start(get_user_bot_users())  # Создание файла Excel
         filename = 'Данные пользователей запустивших бота.xlsx'
         workbook.save(filename)  # Сохранение файла
         await bot.send_document(message.from_user.id, document=FSInputFile(filename),
