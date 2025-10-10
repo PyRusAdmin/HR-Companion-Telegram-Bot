@@ -24,7 +24,7 @@ async def anonymous_question_handler(query: CallbackQuery) -> None:
 
 # Обработчик команды /edit_anonymous_question_handler (только для админа)
 @router.message(Command("edit_anonymous_question_handler"))
-async def prompt_for_new_payment_info(message: Message, state: FSMContext):
+async def edit_anonymous_question_handler(message: Message, state: FSMContext):
     """Редактирование: ❓ Анонимный вопрос"""
     if message.from_user.id not in ADMIN_USER_ID:
         await message.reply("У вас нет прав на выполнение этой команды.")
@@ -45,4 +45,4 @@ async def update_payment_info(message: Message, state: FSMContext):
 
 def register_handlers_anonymous_question_handler() -> None:
     router.callback_query.register(anonymous_question_handler)  # ❓ Анонимный вопрос
-    router.message.register(prompt_for_new_payment_info)  # Редактирование: ❓ Анонимный вопрос
+    router.message.register(edit_anonymous_question_handler)  # Редактирование: ❓ Анонимный вопрос
