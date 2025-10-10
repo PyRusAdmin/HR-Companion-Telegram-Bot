@@ -9,6 +9,7 @@ from aiogram.enums import ParseMode
 from dotenv import load_dotenv
 
 TARGET_USER_ID = [5429188565]  # список ID админов
+ADMIN_USER_ID = [5429188565]
 
 load_dotenv()  # Загружаем переменные окружения из .env
 
