@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from uuid import uuid4
+
 from aiogram import F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
@@ -7,13 +9,9 @@ from aiogram.types import Message
 
 from keyboards.keyboards import back
 from states.states import BotContentEditStates
+from system.system import bot, GROUP_CHAT_ID  # Убедитесь, что у вас есть GROUP_CHAT_ID
 from system.system import router, ADMIN_USER_ID
 from system.working_with_files import save_bot_info, load_bot_info, load_questions_map, save_questions_map
-import json
-import os
-from uuid import uuid4
-from aiogram.types import ReplyKeyboardRemove
-from system.system import bot, GROUP_CHAT_ID  # Убедитесь, что у вас есть GROUP_CHAT_ID
 
 
 @router.callback_query(F.data == "anonymous_question_handler")
