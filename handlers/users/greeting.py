@@ -5,7 +5,7 @@ from aiogram.types import Message
 from loguru import logger
 
 from database.database import save_bot_user, is_user_exists, is_user_status
-from keyboards.keyboards import employee_menu_keyboard, register_keyboard
+from keyboards.keyboards import employee_menu_keyboard, register_keyboard, hr_menu_keyboard
 from system.system import router, bot, dp
 
 
@@ -27,11 +27,18 @@ async def command_start_handler(message: Message) -> None:
                 # reply_markup=register_keyboard()
             )
         else:
-            await bot.send_message(
-                text="Приветствуем в боте!",
-                chat_id=message.chat.id,
-                reply_markup=employee_menu_keyboard()
-            )
+            if message.from_user.id == 5429188565:
+                await  bot.send_message(
+                    text="Добро пожаловать, администратор!",
+                    chat_id=message.chat.id,
+                    reply_markup=hr_menu_keyboard()
+                )
+            else:
+                await bot.send_message(
+                    text="Приветствуем в боте!",
+                    chat_id=message.chat.id,
+                    reply_markup=employee_menu_keyboard()
+                )
     else:
         logger.info("Пользователь отсутствует ❌")
         await bot.send_message(
@@ -44,7 +51,10 @@ async def command_start_handler(message: Message) -> None:
 @router.callback_query(F.data == "back")
 async def callback_back_handler(query: CallbackQuery) -> None:
     """Выводит главное меню бота"""
-    await query.message.answer(text="Приветствуем в боте!", reply_markup=employee_menu_keyboard())
+    if query.from_user.id == 5429188565:
+        await query.message.answer(text="Добро пожаловать, администратор!", reply_markup=hr_menu_keyboard())
+    else:
+        await query.message.answer(text="Приветствуем в боте!", reply_markup=employee_menu_keyboard())
 
 
 def register_greeting_handler() -> None:
