@@ -28,7 +28,7 @@ async def command_start_handler(message: Message) -> None:
                 # reply_markup=register_keyboard()
             )
         else:
-            if message.from_user.id == 5429188565:
+            if message.from_user.id == 1636693956:
                 await  bot.send_message(
                     text="Добро пожаловать, администратор!",
                     chat_id=message.chat.id,
@@ -52,7 +52,7 @@ async def command_start_handler(message: Message) -> None:
 @router.callback_query(F.data == "back")
 async def callback_back_handler(query: CallbackQuery) -> None:
     """Выводит главное меню бота"""
-    if query.from_user.id == 5429188565:
+    if query.from_user.id == 1636693956:
         await query.message.answer(text="Добро пожаловать, администратор!", reply_markup=hr_menu_keyboard())
     else:
         await query.message.answer(text="Приветствуем в боте!", reply_markup=employee_menu_keyboard())
