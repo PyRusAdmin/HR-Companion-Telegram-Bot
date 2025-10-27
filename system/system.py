@@ -8,8 +8,8 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from dotenv import load_dotenv
 
-TARGET_USER_ID = [1636693956]  # список ID админов
-ADMIN_USER_ID = [1636693956]
+TARGET_USER_ID = [1636693956, 8087060538]  # список ID админов (HR)
+ADMIN_USER_ID = [1636693956, 8087060538]  # список ID админов (HR)
 GROUP_CHAT_ID = -1002791848970  # ID чата для ананимных сообщений
 CHANNEL_CHAT_ID = -1001999025723  # ID канала для новостей
 
