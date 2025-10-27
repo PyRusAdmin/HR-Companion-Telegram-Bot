@@ -16,3 +16,8 @@ class BotContentEditStates(StatesGroup):
     """Публикация новостей HR"""
     waiting_for_news_photo = State()  # Ожидание фото для публикации новости
     waiting_for_news_text = State()  # Ожидание текста для публикации новости
+
+    """Добавления сотрудника"""
+    add_employee = State()  # Ввод ID
+    select_role = State()  # Выбор роли
+    select_department = State()  # Выбор отдела

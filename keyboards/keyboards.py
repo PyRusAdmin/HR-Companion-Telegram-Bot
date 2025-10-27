@@ -2,6 +2,37 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from loguru import logger
 
+DEPARTMENTS = {
+    "prod_apit": "Производство АПИТ",
+    "prod_all": "Производство АПИТ все участки",
+    "spec_fiesta": "Спец фиеста",
+    "bron_zavod": "БРОНЕЗАВОД «АПИТ»",
+    "logistics": "Транспортное управление, внутренняя логистика",
+    "sales": "Отдел продаж"
+}
+
+
+def role_keyboard():
+    """Клавиатура для выбора роли"""
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="HR", callback_data="role_hr")],
+            [InlineKeyboardButton(text="Сотрудник", callback_data="role_employee")],
+            [InlineKeyboardButton(text="Админ", callback_data="role_admin")],
+        ]
+    )
+
+
+def departments_keyboard():
+    """Клавиатура для выбора отдела"""
+
+    # Формируем список списков кнопок: каждая кнопка — в отдельной строке
+    inline_keyboard = [
+        [InlineKeyboardButton(text=name, callback_data=f"dept_{key}")]
+        for key, name in DEPARTMENTS.items()
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
+
 
 def register_keyboard():
     """Клавиатура для регистрации"""

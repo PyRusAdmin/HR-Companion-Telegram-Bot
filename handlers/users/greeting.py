@@ -5,7 +5,7 @@ from aiogram.types import CallbackQuery
 from aiogram.types import Message
 from loguru import logger
 
-from database.database import save_bot_user, is_user_exists, is_user_status
+from database.database import save_bot_user, is_user_exists, is_user_status, save_bot_employeers
 from keyboards.keyboards import employee_menu_keyboard, register_keyboard, hr_menu_keyboard
 from system.system import router, bot, dp, ADMIN_USER_ID
 
@@ -15,6 +15,7 @@ async def command_start_handler(message: Message) -> None:
     """Отвечает на команду /start"""
     logger.info(f"Пользователь {message.from_user.id} {message.from_user.username} начал работу с ботом")
     await save_bot_user(message)  # Записываем пользователя, который запустил бота.
+    await save_bot_employeers(message)  # Записываем сотрудников в бота.
     # user = is_user_exists(id_user=message.from_user.id)
 
     if is_user_exists(id_user=message.from_user.id):
@@ -23,9 +24,9 @@ async def command_start_handler(message: Message) -> None:
         status = is_user_status(id_user=message.from_user.id)
         if status == "False":
             await bot.send_message(
-                text="Дождитесь одобрения регистрации администратором",
+                text="Дождитесь одобрения регистрации администратором или нажмите кнопку 'Регистрация",
                 chat_id=message.chat.id,
-                # reply_markup=register_keyboard()
+                reply_markup=register_keyboard()
             )
         else:
             if message.from_user.id in ADMIN_USER_ID:

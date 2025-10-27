@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from loguru import logger
-from peewee import SqliteDatabase, Model, IntegerField, TextField, CharField
+from peewee import SqliteDatabase, Model, IntegerField, TextField, CharField, IntegrityError
 
 # Подключение к БД
 db = SqliteDatabase("database/people.db")
@@ -15,6 +15,8 @@ class Users(Model):
     last_name = TextField(null=True)  # Фамилия пользователя
     first_name = TextField(null=True)  # Имя пользователя
     status = CharField(default=False)  # Разрешение для пользователя
+    role = CharField()  # Роль пользователя (HR, Сотрудник, Администратор)
+    departments = CharField()  # Отделы предприятия
 
     class Meta:
         database = db
@@ -76,6 +78,42 @@ db.connect()
 db.create_tables([Users, BotUsers], safe=True)
 db.close()
 
+async def save_bot_employeers(message):
+    """Сохраняет или обновляет данные пользователя в базе при запуске /start"""
+    user_id = message.from_user.id
+    username = message.from_user.username
+    first_name = message.from_user.first_name
+    last_name = message.from_user.last_name
+
+    try:
+        # Пытаемся создать новую запись
+        Users.create(
+            id_user=user_id,
+            user_name=username,
+            first_name=first_name,
+            last_name=last_name,
+            status="False",  # По умолчанию не подтверждён
+            role="Сотрудник",  # Можно оставить заглушку — HR позже назначит
+            departments=""     # Пусто до назначения
+        )
+        logger.info(f"Новый пользователь добавлен в БД: {user_id}")
+
+    except IntegrityError:
+        # Пользователь уже существует — можно обновить имя/username, если нужно
+        user = Users.get(Users.id_user == user_id)
+        updated = False
+        if user.user_name != username:
+            user.user_name = username
+            updated = True
+        if user.first_name != first_name:
+            user.first_name = first_name
+            updated = True
+        if user.last_name != last_name:
+            user.last_name = last_name
+            updated = True
+        if updated:
+            user.save()
+            logger.info(f"Данные пользователя {user_id} обновлены")
 
 async def save_bot_user(message):
     """
