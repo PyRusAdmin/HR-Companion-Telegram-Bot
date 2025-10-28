@@ -75,7 +75,7 @@ async def export_data(message: types.Message, state: FSMContext):
     await state.clear()
     try:
         # Проверка прав администратора
-        if message.from_user.id not in [535185511, 5429188565]:
+        if message.from_user.id not in ADMIN_USER_ID:
             await message.reply('У вас нет доступа к этой команде.')
             return
 
@@ -137,7 +137,7 @@ async def get_users_who_launched_the_bot(message: types.Message, state: FSMConte
     """Получение данных пользователей, запускающих бота"""
     await state.clear()  # Завершаем текущее состояние машины состояний
     try:
-        if message.from_user.id not in [535185511, 5429188565]:
+        if message.from_user.id not in ADMIN_USER_ID:
             await message.reply('У вас нет доступа к этой команде.')
             return
         workbook = create_excel_file_start(get_user_bot_users())  # Создание файла Excel

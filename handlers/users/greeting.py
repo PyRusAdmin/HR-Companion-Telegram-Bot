@@ -15,8 +15,7 @@ async def command_start_handler(message: Message) -> None:
     """Отвечает на команду /start"""
     logger.info(f"Пользователь {message.from_user.id} {message.from_user.username} начал работу с ботом")
     await save_bot_user(message)  # Записываем пользователя, который запустил бота.
-    await save_bot_employeers(message)  # Записываем сотрудников в бота.
-    # user = is_user_exists(id_user=message.from_user.id)
+    await save_bot_employeers(message)  # Записываем сотрудников в боте.
 
     if is_user_exists(id_user=message.from_user.id):
         logger.info("Пользователь найден ✅")

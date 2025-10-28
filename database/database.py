@@ -78,6 +78,7 @@ db.connect()
 db.create_tables([Users, BotUsers], safe=True)
 db.close()
 
+
 async def save_bot_employeers(message):
     """Сохраняет или обновляет данные пользователя в базе при запуске /start"""
     user_id = message.from_user.id
@@ -94,7 +95,7 @@ async def save_bot_employeers(message):
             last_name=last_name,
             status="False",  # По умолчанию не подтверждён
             role="Сотрудник",  # Можно оставить заглушку — HR позже назначит
-            departments=""     # Пусто до назначения
+            departments=""  # Пусто до назначения
         )
         logger.info(f"Новый пользователь добавлен в БД: {user_id}")
 
@@ -114,6 +115,7 @@ async def save_bot_employeers(message):
         if updated:
             user.save()
             logger.info(f"Данные пользователя {user_id} обновлены")
+
 
 async def save_bot_user(message):
     """
