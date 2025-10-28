@@ -19,8 +19,11 @@ async def dictionary_handler(query: CallbackQuery) -> None:
 
     # Сообщение самому пользователю
     await query.message.answer(
-        text=load_bot_info(messages="media/messages/dictionary_handler.json"),
-        reply_markup=back()
+        text=load_bot_info(
+            messages="media/messages/dictionary_handler.json"
+        ),
+        reply_markup=back(),
+        parse_mode="HTML"
     )
 
 
