@@ -21,3 +21,6 @@ class BotContentEditStates(StatesGroup):
     add_employee = State()  # Ввод ID
     select_role = State()  # Выбор роли
     select_department = State()  # Выбор отдела
+
+    """Удаление сотрудника"""
+    waiting_for_employee_id = State()  # Ввод ID
