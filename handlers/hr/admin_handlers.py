@@ -7,6 +7,7 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import FSInputFile
 from loguru import logger
+from openpyxl.workbook import Workbook
 
 from database.database import get_user_bot_users, get_users
 from system.system import router, bot, ADMIN_USER_ID
@@ -39,29 +40,42 @@ async def admin_send_start(message: types.Message, state: FSMContext):
 
 
 # Функция для создания файла Excel с данными заказов
-def create_excel_file(users):
+def create_excel_file(users_list):
     """
-    Создание Excel файла с данными пользователей из таблицы Users.
+    Создание Excel файла из списка списков.
+    Ожидается, что каждый подсписок содержит 7 элементов в порядке:
+    [id_user, user_name, first_name, last_name, status, role, departments]
     """
-    workbook = openpyxl.Workbook()
+    workbook = Workbook()
     sheet = workbook.active
     sheet.title = "Пользователи"
 
-    # Заголовки столбцов
     headers = [
         'ID аккаунта пользователя',
         'Username',
         'Имя',
         'Фамилия',
-        'Статус (доступ разрешён)'
+        'Статус (доступ разрешён)',
+        'Роль',
+        'Отделы'
     ]
     sheet.append(headers)
 
-    # Заполнение данными
-    for user in users:
-        sheet.append(user)
+    for user in users_list:
+        # Убедитесь, что в списке ровно 7 элементов
+        if len(user) < 7:
+            # Дополняем до 7, если не хватает
+            user = list(user) + [""] * (7 - len(user))
+        sheet.append([
+            user[0] or "",
+            user[1] or "",
+            user[2] or "",
+            user[3] or "",
+            user[4] or "",
+            user[5] or "",
+            user[6] or ""
+        ])
 
-    # Автоматическая ширина столбцов
     for column_cells in sheet.columns:
         length = max(len(str(cell.value or "")) for cell in column_cells)
         sheet.column_dimensions[column_cells[0].column_letter].width = length + 2
