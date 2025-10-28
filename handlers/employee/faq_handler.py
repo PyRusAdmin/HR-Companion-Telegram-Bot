@@ -19,7 +19,8 @@ async def faq_handler(query: CallbackQuery) -> None:
     # Сообщение самому пользователю
     await query.message.answer(
         text=load_bot_info(messages="media/messages/faq_handler.json"),
-        reply_markup=back()
+        reply_markup=back(),
+        parse_mode="HTML"
     )
 
 
