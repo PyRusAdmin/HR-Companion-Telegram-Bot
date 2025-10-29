@@ -29,3 +29,13 @@ def save_questions_map(data):
     os.makedirs(os.path.dirname(QUESTIONS_FILE), exist_ok=True)
     with open(QUESTIONS_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
+
+
+def load_department_channels():
+    """Чтение данных из файла с группами и каналами"""
+    try:
+        with open("database/data.json", "r", encoding="utf-8") as f:
+            DEPARTMENT_CHANNELS = json.load(f)
+        return DEPARTMENT_CHANNELS
+    except Exception as e:
+        logger.exception(e)

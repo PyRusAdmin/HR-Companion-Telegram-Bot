@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-import json
-
 from aiogram import F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
@@ -10,15 +8,7 @@ from database.database import write_database, Users
 from keyboards.keyboards import back, confirmation_keyboard, role_keyboard, departments_keyboard, DEPARTMENTS, role_map
 from states.states import BotContentEditStates
 from system.system import TARGET_USER_ID, bot, router
-
-
-def load_department_channels():
-    try:
-        with open("database/data.json", "r", encoding="utf-8") as f:
-            DEPARTMENT_CHANNELS = json.load(f)
-        return DEPARTMENT_CHANNELS
-    except Exception as e:
-        logger.exception(e)
+from system.working_with_files import load_department_channels
 
 
 @router.callback_query(F.data == "registration")
@@ -158,6 +148,7 @@ async def select_department_for_new_user(query: CallbackQuery, state: FSMContext
             text=f"✅ Пользователь успешно зарегистрирован!\n"
                  f"ID: {target_id}\nРоль: {role}\nОтдел: {department}"
         )
+
         DEPARTMENT_CHANNELS = load_department_channels()
         # Отправляем пользователю сообщение с группами
         channels = DEPARTMENT_CHANNELS.get(department, [])

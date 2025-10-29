@@ -3,12 +3,14 @@ from aiogram import F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from aiogram.types import Message
+from loguru import logger
 
 from database.database import Users
 from keyboards.keyboards import back, role_keyboard, departments_keyboard, DEPARTMENTS, role_map
 from states.states import BotContentEditStates
+from system.system import bot
 from system.system import router
-from loguru import logger
+from system.working_with_files import load_department_channels
 
 
 @router.callback_query(F.data == "add_employee_handler")
@@ -99,6 +101,20 @@ async def select_department_handler(query: CallbackQuery, state: FSMContext):
                  f"Роль: {role}\n"
                  f"Отдел: {department}"
         )
+
+        DEPARTMENT_CHANNELS = load_department_channels()
+        # Отправляем пользователю сообщение с группами
+        channels = DEPARTMENT_CHANNELS.get(department, [])
+        links_text = "\n".join(f"• {link}" for link in channels)
+        await bot.send_message(
+            chat_id=target_id,
+            text=(
+                "📌 Пожалуйста, подпишитесь на следующие группы:\n"
+                f"{links_text}"
+            ),
+            reply_markup=back()
+        )
+
     except Exception as e:
         logger.error(f"Ошибка при обновлении пользователя {target_id}: {e}")
         await query.message.edit_text("❌ Произошла ошибка при сохранении данных.")
@@ -110,5 +126,4 @@ def register_handlers_add_employee_handler() -> None:
     router.callback_query.register(add_employee_handler, F.data == "add_employee_handler")
     router.message.register(add_employee, BotContentEditStates.add_employee)
     router.callback_query.register(select_role_handler, F.data.startswith("role_"), BotContentEditStates.select_role)
-    router.callback_query.register(select_department_handler, F.data.startswith("dept_"),
-                                   BotContentEditStates.select_department)
+    router.callback_query.register(select_department_handler, F.data.startswith("dept_"), BotContentEditStates.select_department)
