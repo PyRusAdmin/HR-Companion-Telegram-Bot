@@ -161,7 +161,8 @@ async def select_department_for_new_user(query: CallbackQuery, state: FSMContext
                 "📌 Пожалуйста, подпишитесь на следующие группы:\n"
                 f"{links_text}"
             ),
-            reply_markup=back()
+            reply_markup=back(),
+            disable_web_page_preview=True
         )
 
         await state.clear()

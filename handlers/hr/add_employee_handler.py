@@ -112,7 +112,8 @@ async def select_department_handler(query: CallbackQuery, state: FSMContext):
                 "📌 Пожалуйста, подпишитесь на следующие группы:\n"
                 f"{links_text}"
             ),
-            reply_markup=back()
+            reply_markup=back(),
+            disable_web_page_preview=True
         )
 
     except Exception as e:
@@ -126,4 +127,5 @@ def register_handlers_add_employee_handler() -> None:
     router.callback_query.register(add_employee_handler, F.data == "add_employee_handler")
     router.message.register(add_employee, BotContentEditStates.add_employee)
     router.callback_query.register(select_role_handler, F.data.startswith("role_"), BotContentEditStates.select_role)
-    router.callback_query.register(select_department_handler, F.data.startswith("dept_"), BotContentEditStates.select_department)
+    router.callback_query.register(select_department_handler, F.data.startswith("dept_"),
+                                   BotContentEditStates.select_department)
