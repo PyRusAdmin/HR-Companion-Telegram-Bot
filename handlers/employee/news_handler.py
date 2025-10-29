@@ -4,16 +4,13 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from aiogram.types import Message
-
-from keyboards.keyboards import back_news
-from states.states import BotContentEditStates
-from system.system import ADMIN_USER_ID
-from system.system import router
-from system.working_with_files import load_bot_info, save_bot_info, is_allowed_chat
 from loguru import logger
 
-
-
+from database.database import get_admin_ids
+from keyboards.keyboards import back_news
+from states.states import BotContentEditStates
+from system.system import router
+from system.working_with_files import load_bot_info, save_bot_info, is_allowed_chat
 
 
 @router.callback_query(F.data == "news_handler")
@@ -37,7 +34,10 @@ async def news_handler(query: CallbackQuery) -> None:
 @router.message(Command("edit_news_handler"))
 async def edit_news_handler(message: Message, state: FSMContext):
     """Редактирование: 📢 Новости и акции"""
-    if message.from_user.id not in ADMIN_USER_ID:
+    # Получаем актуальный список админов из БД
+    admin_ids = get_admin_ids()
+
+    if message.from_user.id not in admin_ids:
         await message.reply("У вас нет прав на выполнение этой команды.")
         return
     await message.answer("Введите новый текст, используя разметку HTML.")

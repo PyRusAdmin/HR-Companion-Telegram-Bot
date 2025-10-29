@@ -5,9 +5,10 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from aiogram.types import Message, ContentType
 
+from database.database import get_admin_ids
 from keyboards.keyboards import back
 from states.states import BotContentEditStates
-from system.system import bot, ADMIN_USER_ID, CHANNEL_CHAT_ID
+from system.system import bot, CHANNEL_CHAT_ID
 from system.system import router
 
 
@@ -36,8 +37,12 @@ async def publish_advertisement_handler(query: CallbackQuery) -> None:
 @router.message(Command("send_news"))
 async def start_news_sending(message: Message, state: FSMContext):
     """Начало отправки новости — только для админов"""
-    if message.from_user.id not in ADMIN_USER_ID:
-        await message.reply("❌ У вас нет прав на отправку новостей.")
+
+    # Получаем актуальный список админов из БД
+    admin_ids = get_admin_ids()
+
+    if message.from_user.id not in admin_ids:
+        await message.reply("У вас нет прав на выполнение этой команды.")
         return
 
     await message.answer("📝 Отправьте текст новости (можно с HTML-разметкой).")
@@ -60,7 +65,10 @@ async def receive_news_text(message: Message, state: FSMContext):
 @router.message(Command("skip"))
 async def skip_photo(message: Message, state: FSMContext):
     """Пропустить фото и опубликовать только текст"""
-    if message.from_user.id not in ADMIN_USER_ID:
+
+    admin_ids = get_admin_ids()
+
+    if message.from_user.id not in admin_ids:
         return
 
     data = await state.get_data()

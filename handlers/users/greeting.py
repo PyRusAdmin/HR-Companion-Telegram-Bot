@@ -5,9 +5,9 @@ from aiogram.types import CallbackQuery, update
 from aiogram.types import Message
 from loguru import logger
 
-from database.database import save_bot_user, is_user_exists, is_user_status, save_bot_employeers
+from database.database import save_bot_user, is_user_exists, is_user_status, save_bot_employeers, get_admin_ids
 from keyboards.keyboards import employee_menu_keyboard, register_keyboard, hr_menu_keyboard
-from system.system import router, bot, dp, ADMIN_USER_ID
+from system.system import router, bot, dp
 
 
 @dp.message(CommandStart())
@@ -28,6 +28,9 @@ async def command_start_handler(message: Message) -> None:
         logger.info(f"Запрещённый чат {message.chat.id}. Сообщение проигнорировано.")
         return
 
+    admin_ids = get_admin_ids()
+    logger.info(f"Список админов: {admin_ids}")
+
     logger.info(f"Пользователь {message.from_user.id} {message.from_user.username} начал работу с ботом")
     await save_bot_user(message)  # Записываем пользователя, который запустил бота.
     await save_bot_employeers(message)  # Записываем сотрудников в боте.
@@ -43,7 +46,7 @@ async def command_start_handler(message: Message) -> None:
                 reply_markup=register_keyboard()
             )
         else:
-            if message.from_user.id in ADMIN_USER_ID:
+            if message.from_user.id in admin_ids:
                 await  bot.send_message(
                     text="Добро пожаловать, администратор!",
                     chat_id=message.chat.id,
@@ -67,7 +70,11 @@ async def command_start_handler(message: Message) -> None:
 @router.callback_query(F.data == "back")
 async def callback_back_handler(query: CallbackQuery) -> None:
     """Выводит главное меню бота"""
-    if query.from_user.id in ADMIN_USER_ID:
+
+    # Получаем актуальный список админов из БД
+    admin_ids = get_admin_ids()
+
+    if query.from_user.id in admin_ids:
         await query.message.answer(text="Добро пожаловать, администратор!", reply_markup=hr_menu_keyboard())
     else:
         await query.message.answer(text="Приветствуем в боте!", reply_markup=employee_menu_keyboard())

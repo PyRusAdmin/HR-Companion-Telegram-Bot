@@ -5,9 +5,9 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from aiogram.types import Message
 
+from database.database import get_admin_ids
 from keyboards.keyboards import back
 from states.states import BotContentEditStates
-from system.system import ADMIN_USER_ID
 from system.system import router
 from system.working_with_files import load_bot_info, save_bot_info, is_allowed_chat
 from loguru import logger
@@ -34,7 +34,10 @@ async def faq_handler(query: CallbackQuery) -> None:
 @router.message(Command("edit_faq_handler"))
 async def edit_faq_handler(message: Message, state: FSMContext):
     """Редактирование: 🔍 FAQ"""
-    if message.from_user.id not in ADMIN_USER_ID:
+    # Получаем актуальный список админов из БД
+    admin_ids = get_admin_ids()
+
+    if message.from_user.id not in admin_ids:
         await message.reply("У вас нет прав на выполнение этой команды.")
         return
     await message.answer("Введите новый текст, используя разметку HTML.")

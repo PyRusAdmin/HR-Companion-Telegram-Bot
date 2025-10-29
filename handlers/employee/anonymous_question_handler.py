@@ -7,10 +7,11 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from aiogram.types import Message
 
+from database.database import get_admin_ids
 from keyboards.keyboards import back
 from states.states import BotContentEditStates
 from system.system import bot, GROUP_CHAT_ID  # Убедитесь, что у вас есть GROUP_CHAT_ID
-from system.system import router, ADMIN_USER_ID
+from system.system import router
 from system.working_with_files import save_bot_info, load_bot_info, load_questions_map, save_questions_map, \
     is_allowed_chat
 from loguru import logger
@@ -112,7 +113,9 @@ async def handle_manager_reply(message: Message):
 @router.message(Command("edit_anonymous_question_handler"))
 async def edit_anonymous_question_handler(message: Message, state: FSMContext):
     """Редактирование: ❓ Анонимный вопрос"""
-    if message.from_user.id not in ADMIN_USER_ID:
+    admin_ids = get_admin_ids()
+
+    if message.from_user.id not in admin_ids:
         await message.reply("У вас нет прав на выполнение этой команды.")
         return
     await message.answer("Введите новый текст, используя разметку HTML.")

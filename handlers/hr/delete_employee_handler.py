@@ -7,10 +7,10 @@ from aiogram.types import CallbackQuery
 from aiogram.types import Message
 from loguru import logger
 
-from database.database import Users
+from database.database import Users, get_admin_ids
 from keyboards.keyboards import back
 from states.states import BotContentEditStates
-from system.system import ADMIN_USER_ID, bot
+from system.system import bot
 from system.system import router
 
 
@@ -27,8 +27,11 @@ def load_chat_ids():
 async def delete_employee_handler(query: CallbackQuery, state: FSMContext) -> None:
     """🚪 Удалить сотрудника"""
 
-    if query.from_user.id not in ADMIN_USER_ID:
-        await query.reply("У вас нет прав на выполнение этой команды.")
+    admin_ids = get_admin_ids()
+
+    # Проверяем ID пользователя из callback-запроса
+    if query.from_user.id not in admin_ids:
+        await query.answer("У вас нет прав на выполнение этой команды.", show_alert=True)
         return
 
     # Сообщение самому пользователю

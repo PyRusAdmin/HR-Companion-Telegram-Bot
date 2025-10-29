@@ -4,16 +4,20 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from loguru import logger
 
-from database.database import write_database, Users
+from database.database import write_database, Users, get_admin_ids
 from keyboards.keyboards import back, confirmation_keyboard, role_keyboard, departments_keyboard, DEPARTMENTS, role_map
 from states.states import BotContentEditStates
-from system.system import ADMIN_USER_ID, bot, router
+from system.system import bot, router
 from system.working_with_files import load_department_channels
 
 
 @router.callback_query(F.data == "registration")
 async def callback_register_handler(query: CallbackQuery) -> None:
     """Регистрация пользователя"""
+
+    # Получаем актуальный список админов из БД
+    admin_ids = get_admin_ids()
+
     logger.debug(
         f"ID: {query.from_user.id}, username: {query.from_user.username}, "
         f"last_name: {query.from_user.last_name}, first_name: {query.from_user.first_name}"
@@ -24,7 +28,7 @@ async def callback_register_handler(query: CallbackQuery) -> None:
     После подтверждения регистрации статус меняется на "True".
     """
     # если пользователь сам админ → сразу True
-    status = "True" if query.from_user.id in ADMIN_USER_ID else "False"
+    status = "True" if query.from_user.id in admin_ids else "False"
 
     write_database(
         id_user=query.from_user.id,  # id пользователя
@@ -39,7 +43,7 @@ async def callback_register_handler(query: CallbackQuery) -> None:
     )
 
     # Сообщение всем админам
-    for admin_id in ADMIN_USER_ID:
+    for admin_id in admin_ids:
         await bot.send_message(
             chat_id=admin_id,  # здесь точно int, не список!
             text=f"Пользователь @{query.from_user.username or query.from_user.id} "

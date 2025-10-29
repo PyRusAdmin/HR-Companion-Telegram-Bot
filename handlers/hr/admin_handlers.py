@@ -8,9 +8,10 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import FSInputFile
 from loguru import logger
 from openpyxl.workbook import Workbook
+from peewee import IntegrityError
 
-from database.database import get_user_bot_users, get_users
-from system.system import router, bot, ADMIN_USER_ID
+from database.database import get_user_bot_users, get_users, get_admin_ids, Admin
+from system.system import router, bot
 
 
 @router.message(Command('help'))
@@ -18,10 +19,15 @@ async def admin_send_start(message: types.Message, state: FSMContext):
     """Обработчик команды /start, он же пост приветствия 👋"""
     await state.clear()  # Завершаем текущее состояние машины состояний
 
-    """Админ панель"""
-    if message.from_user.id not in ADMIN_USER_ID:
+    # Получаем актуальный список админов из БД
+    admin_ids = get_admin_ids()
+
+    if message.from_user.id not in admin_ids:
         await message.reply("У вас нет прав на выполнение этой команды.")
         return
+
+    """Админ панель"""
+
     await message.answer("Команды админа:\n\n"
 
                          "<b>Редактирование текста и отправка сообщений:</b>\n\n"
@@ -36,6 +42,9 @@ async def admin_send_start(message: types.Message, state: FSMContext):
                          "/get_a_list_of_users_registered_in_the_bot - Получение списка зарегистрированных "
                          "пользователей\n"
                          "/get_users_who_launched_the_bot - Получение данных пользователей, запускающих бота\n\n"
+
+                         "<b>Добавление:</b>\n"
+                         "/add_admin - Добавить пользователя в админы. Укажите ID пользователя: /add_admin ID\n\n"
 
                          "/start - начальное меню\n", parse_mode="HTML")
 
@@ -89,9 +98,11 @@ async def export_data(message: types.Message, state: FSMContext):
     """Получение списка зарегистрированных пользователей"""
     await state.clear()
     try:
-        # Проверка прав администратора
-        if message.from_user.id not in ADMIN_USER_ID:
-            await message.reply('У вас нет доступа к этой команде.')
+        # Получаем актуальный список админов из БД
+        admin_ids = get_admin_ids()
+
+        if message.from_user.id not in admin_ids:
+            await message.reply("У вас нет прав на выполнение этой команды.")
             return
 
         users = get_users()
@@ -152,9 +163,13 @@ async def get_users_who_launched_the_bot(message: types.Message, state: FSMConte
     """Получение данных пользователей, запускающих бота"""
     await state.clear()  # Завершаем текущее состояние машины состояний
     try:
-        if message.from_user.id not in ADMIN_USER_ID:
-            await message.reply('У вас нет доступа к этой команде.')
+        # Получаем актуальный список админов из БД
+        admin_ids = get_admin_ids()
+
+        if message.from_user.id not in admin_ids:
+            await message.reply("У вас нет прав на выполнение этой команды.")
             return
+
         workbook = create_excel_file_start(get_user_bot_users())  # Создание файла Excel
         filename = 'Данные пользователей запустивших бота.xlsx'
         workbook.save(filename)  # Сохранение файла
@@ -166,8 +181,29 @@ async def get_users_who_launched_the_bot(message: types.Message, state: FSMConte
         logger.error(e)
 
 
+@router.message(Command('add_admin'))
+async def add_admin(message: types.Message):
+    """Добавляет пользователя в список админов"""
+    admin_ids = get_admin_ids()
+
+    if message.from_user.id not in admin_ids:
+        await message.reply("У вас нет прав на выполнение этой команды.")
+        return
+
+    # Пример: /add_admin 123456789
+    try:
+        user_id = int(message.text.split()[1])
+        Admin.create(user_id=user_id)
+        await message.reply(f"Пользователь {user_id} добавлен в админы.")
+    except (IndexError, ValueError):
+        await message.reply("Укажите ID пользователя: /add_admin <ID>")
+    except IntegrityError:  # Если ID уже есть в БД
+        await message.reply(f"Пользователь {user_id} уже является админом.")
+
+
 def register_admin_greeting_handler():
     """Регистрируем handlers для бота"""
     router.message.register(admin_send_start)
     router.message.register(export_data)
     router.message.register(get_users_who_launched_the_bot)
+    router.message.register(add_admin)

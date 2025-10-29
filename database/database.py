@@ -73,9 +73,27 @@ def get_user_bot_users():
     return datas
 
 
+class Admin(Model):
+    user_id = IntegerField(unique=True)
+
+    class Meta:
+        database = db
+
+
+def get_admin_ids() -> list:
+    """Получает список ID админов из БД"""
+    try:
+        return [admin.user_id for admin in Admin.select()]
+    except Exception as e:
+        logger.error(f"Ошибка при получении админов из БД: {e}")
+        return []  # Возвращаем пустой список при ошибке
+
+
 # Создаём таблицу при загрузке модуля
 db.connect()
 db.create_tables([Users, BotUsers], safe=True)
+# Создайте таблицу (выполните один раз)
+db.create_tables([Admin])
 db.close()
 
 
