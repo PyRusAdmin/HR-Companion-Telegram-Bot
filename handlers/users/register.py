@@ -7,7 +7,7 @@ from loguru import logger
 from database.database import write_database, Users
 from keyboards.keyboards import back, confirmation_keyboard, role_keyboard, departments_keyboard, DEPARTMENTS, role_map
 from states.states import BotContentEditStates
-from system.system import TARGET_USER_ID, bot, router
+from system.system import ADMIN_USER_ID, bot, router
 from system.working_with_files import load_department_channels
 
 
@@ -24,7 +24,7 @@ async def callback_register_handler(query: CallbackQuery) -> None:
     После подтверждения регистрации статус меняется на "True".
     """
     # если пользователь сам админ → сразу True
-    status = "True" if query.from_user.id in TARGET_USER_ID else "False"
+    status = "True" if query.from_user.id in ADMIN_USER_ID else "False"
 
     write_database(
         id_user=query.from_user.id,  # id пользователя
@@ -39,7 +39,7 @@ async def callback_register_handler(query: CallbackQuery) -> None:
     )
 
     # Сообщение всем админам
-    for admin_id in TARGET_USER_ID:
+    for admin_id in ADMIN_USER_ID:
         await bot.send_message(
             chat_id=admin_id,  # здесь точно int, не список!
             text=f"Пользователь @{query.from_user.username or query.from_user.id} "
