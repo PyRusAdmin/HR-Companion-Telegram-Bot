@@ -51,6 +51,20 @@ def register_keyboard():
     )
 
 
+def back_news():
+    """Клавиатура для возврата"""
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(
+                text="Архив новостей", url="https://t.me/tehnik_shanel")],
+            [InlineKeyboardButton(
+                text="Главное меню", callback_data="back")
+
+            ]
+        ]
+    )
+
+
 def back():
     """Клавиатура для возврата"""
     return InlineKeyboardMarkup(
@@ -78,22 +92,6 @@ def confirmation_keyboard(user_id: int):
             ]
         ]
     )
-
-
-# def confirmation_keyboard(user_id: int):
-#     """Клавиатура для подтверждения регистрации"""
-#     return InlineKeyboardMarkup(
-#         inline_keyboard=[
-#             [
-#                 InlineKeyboardButton(
-#                     text="Подтвердить", callback_data=f"confirm:{user_id}"
-#                 ),
-#                 InlineKeyboardButton(
-#                     text="Отклонить", callback_data=f"reject:{user_id}"
-#                 )
-#             ]
-#         ]
-#     )
 
 
 def employee_menu_keyboard() -> InlineKeyboardMarkup | None:

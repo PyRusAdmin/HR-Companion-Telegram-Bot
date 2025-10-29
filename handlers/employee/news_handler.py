@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from aiogram.types import Message
 
-from keyboards.keyboards import back
+from keyboards.keyboards import back_news
 from states.states import BotContentEditStates
 from system.system import ADMIN_USER_ID
 from system.system import router
@@ -19,7 +19,7 @@ async def news_handler(query: CallbackQuery) -> None:
     # Сообщение самому пользователю
     await query.message.answer(
         text=load_bot_info(messages="media/messages/news_handler.json"),
-        reply_markup=back(),
+        reply_markup=back_news(),
         parse_mode="HTML"
     )
 
