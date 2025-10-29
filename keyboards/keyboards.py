@@ -3,8 +3,8 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from loguru import logger
 
 DEPARTMENTS = {
-    "supply_department": "Отдел Снабжения ",
-    "logistics_department": "Отдел логистики ",
+    "supply_department": "Отдел Снабжения",
+    "logistics_department": "Отдел логистики",
     "bron_zavod": "Бронезвод",
     "office": "Офис",
     "logistics": "Транспортное управление, внутренняя логистика",

@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import json
+
 from aiogram import F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
@@ -8,6 +10,15 @@ from database.database import write_database, Users
 from keyboards.keyboards import back, confirmation_keyboard, role_keyboard, departments_keyboard, DEPARTMENTS, role_map
 from states.states import BotContentEditStates
 from system.system import TARGET_USER_ID, bot, router
+
+
+def load_department_channels():
+    try:
+        with open("database/data.json", "r", encoding="utf-8") as f:
+            DEPARTMENT_CHANNELS = json.load(f)
+        return DEPARTMENT_CHANNELS
+    except Exception as e:
+        logger.exception(e)
 
 
 @router.callback_query(F.data == "registration")
@@ -107,23 +118,23 @@ async def select_role_for_new_user(query: CallbackQuery, state: FSMContext):
 
 @router.callback_query(F.data.startswith("dept_"), BotContentEditStates.select_department_for_new_user)
 async def select_department_for_new_user(query: CallbackQuery, state: FSMContext):
-    dept_key = query.data.replace("dept_", "", 1).strip()
-    department = DEPARTMENTS.get(dept_key)
-
-    if not department:
-        await query.answer("Неизвестный отдел", show_alert=True)
-        return
-
-    data = await state.get_data()
-    target_id = data.get("target_user_id")
-    role = data.get("selected_role")
-
-    if not target_id or not role:
-        await query.message.edit_text("❌ Недостаточно данных для завершения регистрации.")
-        await state.clear()
-        return
-
     try:
+        dept_key = query.data.replace("dept_", "", 1).strip()
+        department = DEPARTMENTS.get(dept_key)
+
+        if not department:
+            await query.answer("Неизвестный отдел", show_alert=True)
+            return
+
+        data = await state.get_data()
+        target_id = data.get("target_user_id")
+        role = data.get("selected_role")
+
+        if not target_id or not role:
+            await query.message.edit_text("❌ Недостаточно данных для завершения регистрации.")
+            await state.clear()
+            return
+
         # Получаем или создаём запись (на случай, если что-то пошло не так при регистрации)
         user, created = Users.get_or_create(
             id_user=target_id,
@@ -147,21 +158,24 @@ async def select_department_for_new_user(query: CallbackQuery, state: FSMContext
             text=f"✅ Пользователь успешно зарегистрирован!\n"
                  f"ID: {target_id}\nРоль: {role}\nОтдел: {department}"
         )
+        DEPARTMENT_CHANNELS = load_department_channels()
+        # Отправляем пользователю сообщение с группами
+        channels = DEPARTMENT_CHANNELS.get(department, [])
+        links_text = "\n".join(f"• {link}" for link in channels)
 
-        # Уведомляем пользователя
         await bot.send_message(
             chat_id=target_id,
-            text="✅ Ваша регистрация подтверждена!\n"
-                 f"Вам назначена роль: {role}\n"
-                 f"Отдел: {department}",
+            text=(
+                "✅ Ваша регистрация подтверждена!\n\n"
+                "📌 Пожалуйста, подпишитесь на следующие группы:\n"
+                f"{links_text}"
+            ),
             reply_markup=back()
         )
 
+        await state.clear()
     except Exception as e:
-        logger.error(f"Ошибка при назначении роли пользователю {target_id}: {e}")
-        await query.message.edit_text("❌ Ошибка при сохранении данных.")
-
-    await state.clear()
+        logger.exception(e)
 
 
 def register_handler() -> None:
