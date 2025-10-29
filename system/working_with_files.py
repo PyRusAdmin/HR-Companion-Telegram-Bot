@@ -40,3 +40,12 @@ def load_department_channels():
         return DEPARTMENT_CHANNELS
     except Exception as e:
         logger.exception(e)
+
+
+def is_allowed_chat(chat) -> bool:
+    """Проверяет, является ли чат разрешённым для работы бота"""
+    allowed_group_ids = [-1002791848970, -1001999025723]
+    return (
+            chat.type == "private" or
+            chat.id in allowed_group_ids
+    )

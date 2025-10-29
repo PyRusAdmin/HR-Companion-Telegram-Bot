@@ -11,12 +11,19 @@ from keyboards.keyboards import back
 from states.states import BotContentEditStates
 from system.system import bot, GROUP_CHAT_ID  # Убедитесь, что у вас есть GROUP_CHAT_ID
 from system.system import router, ADMIN_USER_ID
-from system.working_with_files import save_bot_info, load_bot_info, load_questions_map, save_questions_map
+from system.working_with_files import save_bot_info, load_bot_info, load_questions_map, save_questions_map, \
+    is_allowed_chat
+from loguru import logger
 
 
 @router.callback_query(F.data == "anonymous_question_handler")
 async def anonymous_question_handler(query: CallbackQuery, state: FSMContext) -> None:
     """❓ Анонимный вопрос"""
+
+    # В обработчике:
+    if not is_allowed_chat(query.message.chat):
+        logger.info(f"Запрещённый чат {query.message.chat.id}")
+        return
 
     # Сообщение самому пользователю
     await query.message.answer(

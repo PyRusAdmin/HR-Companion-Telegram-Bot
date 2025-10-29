@@ -17,6 +17,7 @@ from system.system import router, bot, ADMIN_USER_ID
 async def admin_send_start(message: types.Message, state: FSMContext):
     """Обработчик команды /start, он же пост приветствия 👋"""
     await state.clear()  # Завершаем текущее состояние машины состояний
+
     """Админ панель"""
     if message.from_user.id not in ADMIN_USER_ID:
         await message.reply("У вас нет прав на выполнение этой команды.")

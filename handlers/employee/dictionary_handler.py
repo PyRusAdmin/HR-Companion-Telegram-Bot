@@ -9,13 +9,19 @@ from keyboards.keyboards import back
 from states.states import BotContentEditStates
 from system.system import ADMIN_USER_ID
 from system.system import router
-from system.working_with_files import load_bot_info
+from system.working_with_files import load_bot_info, is_allowed_chat
 from system.working_with_files import save_bot_info
+from loguru import logger
 
 
 @router.callback_query(F.data == "dictionary_handler")
 async def dictionary_handler(query: CallbackQuery) -> None:
     """📖 Справочник"""
+
+    # В обработчике:
+    if not is_allowed_chat(query.message.chat):
+        logger.info(f"Запрещённый чат {query.message.chat.id}")
+        return
 
     # Сообщение самому пользователю
     await query.message.answer(

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from aiogram import F
 from aiogram.filters import CommandStart
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, update
 from aiogram.types import Message
 from loguru import logger
 
@@ -13,6 +13,21 @@ from system.system import router, bot, dp, ADMIN_USER_ID
 @dp.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
     """Отвечает на команду /start"""
+
+    allowed_group_ids = [-1002791848970, -1001999025723]  # Только группы
+
+    # Разрешаем: 1) личку, 2) разрешённые группы
+    if message.chat.type == "private":
+        # Это личное сообщение — разрешаем
+        pass
+    elif message.chat.id in allowed_group_ids:
+        # Это разрешённая группа — разрешаем
+        pass
+    else:
+        # Всё остальное — блокируем
+        logger.info(f"Запрещённый чат {message.chat.id}. Сообщение проигнорировано.")
+        return
+
     logger.info(f"Пользователь {message.from_user.id} {message.from_user.username} начал работу с ботом")
     await save_bot_user(message)  # Записываем пользователя, который запустил бота.
     await save_bot_employeers(message)  # Записываем сотрудников в боте.

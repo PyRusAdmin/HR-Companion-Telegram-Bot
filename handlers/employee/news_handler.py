@@ -9,12 +9,21 @@ from keyboards.keyboards import back_news
 from states.states import BotContentEditStates
 from system.system import ADMIN_USER_ID
 from system.system import router
-from system.working_with_files import load_bot_info, save_bot_info
+from system.working_with_files import load_bot_info, save_bot_info, is_allowed_chat
+from loguru import logger
+
+
+
 
 
 @router.callback_query(F.data == "news_handler")
 async def news_handler(query: CallbackQuery) -> None:
     """📢 Новости и акции"""
+
+    # В обработчике:
+    if not is_allowed_chat(query.message.chat):
+        logger.info(f"Запрещённый чат {query.message.chat.id}")
+        return
 
     # Сообщение самому пользователю
     await query.message.answer(
