@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from aiogram import F
+from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from loguru import logger
 
-from database.database import write_database
-from keyboards.keyboards import back, confirmation_keyboard
+from database.database import write_database, Users
+from keyboards.keyboards import back, confirmation_keyboard, role_keyboard, departments_keyboard, DEPARTMENTS, role_map
+from states.states import BotContentEditStates
 from system.system import TARGET_USER_ID, bot, router
 
 
@@ -68,6 +70,103 @@ async def confirm_user(query: CallbackQuery) -> None:
     )
 
 
+@router.callback_query(F.data.startswith("assign_role:"))
+async def assign_role_start(query: CallbackQuery, state: FSMContext):
+    target_id = int(query.data.split(":")[1])
+
+    # Сохраняем ID в состоянии
+    await state.update_data(target_user_id=target_id)
+
+    await query.message.edit_text(
+        text="Выберите роль для пользователя:",
+        reply_markup=role_keyboard()
+    )
+    await state.set_state(BotContentEditStates.select_role_for_new_user)
+
+
+@router.callback_query(F.data.startswith("role_"), BotContentEditStates.select_role_for_new_user)
+async def select_role_for_new_user(query: CallbackQuery, state: FSMContext):
+    """Выбор роли для нового пользователя"""
+
+    role_key = query.data
+    role = role_map.get(role_key)
+
+    if not role:
+        await query.answer("Неизвестная роль", show_alert=True)
+        return
+
+    await state.update_data(selected_role=role)
+
+    # Отправляем клавиатуру выбора отдела
+    await query.message.edit_text(
+        text=f"Вы выбрали роль: {role}\n\nТеперь выберите отдел:",
+        reply_markup=departments_keyboard()
+    )
+    await state.set_state(BotContentEditStates.select_department_for_new_user)
+
+
+@router.callback_query(F.data.startswith("dept_"), BotContentEditStates.select_department_for_new_user)
+async def select_department_for_new_user(query: CallbackQuery, state: FSMContext):
+    dept_key = query.data.replace("dept_", "", 1).strip()
+    department = DEPARTMENTS.get(dept_key)
+
+    if not department:
+        await query.answer("Неизвестный отдел", show_alert=True)
+        return
+
+    data = await state.get_data()
+    target_id = data.get("target_user_id")
+    role = data.get("selected_role")
+
+    if not target_id or not role:
+        await query.message.edit_text("❌ Недостаточно данных для завершения регистрации.")
+        await state.clear()
+        return
+
+    try:
+        # Получаем или создаём запись (на случай, если что-то пошло не так при регистрации)
+        user, created = Users.get_or_create(
+            id_user=target_id,
+            defaults={
+                "user_name": None,
+                "first_name": None,
+                "last_name": None,
+                "status": "True",
+                "role": role,
+                "departments": department
+            }
+        )
+        if not created:
+            # Обновляем существующую запись
+            user.status = "True"
+            user.role = role
+            user.departments = department
+            user.save()
+
+        await query.message.edit_text(
+            text=f"✅ Пользователь успешно зарегистрирован!\n"
+                 f"ID: {target_id}\nРоль: {role}\nОтдел: {department}"
+        )
+
+        # Уведомляем пользователя
+        await bot.send_message(
+            chat_id=target_id,
+            text="✅ Ваша регистрация подтверждена!\n"
+                 f"Вам назначена роль: {role}\n"
+                 f"Отдел: {department}",
+            reply_markup=back()
+        )
+
+    except Exception as e:
+        logger.error(f"Ошибка при назначении роли пользователю {target_id}: {e}")
+        await query.message.edit_text("❌ Ошибка при сохранении данных.")
+
+    await state.clear()
+
+
 def register_handler() -> None:
     router.callback_query.register(callback_register_handler)  # Регистрация
     router.callback_query.register(confirm_user)  # Подтверждение регистрации
+    router.callback_query.register(assign_role_start)  # Выбор роли
+    router.callback_query.register(select_role_for_new_user)  # Выбор отдела
+    router.callback_query.register(select_department_for_new_user)  # Выбор отдела

@@ -3,12 +3,19 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from loguru import logger
 
 DEPARTMENTS = {
-    "prod_apit": "Производство АПИТ",
-    "prod_all": "Производство АПИТ все участки",
-    "spec_fiesta": "Спец фиеста",
-    "bron_zavod": "БРОНЕЗАВОД «АПИТ»",
+    "supply_department": "Отдел Снабжения ",
+    "logistics_department": "Отдел логистики ",
+    "bron_zavod": "Бронезвод",
+    "office": "Офис",
     "logistics": "Транспортное управление, внутренняя логистика",
+    "prod_apit": "Производство",
     "sales": "Отдел продаж"
+}
+
+role_map = {
+    "role_hr": "HR",
+    "role_employee": "Сотрудник",
+    "role_admin": "Админ"
 }
 
 
@@ -63,7 +70,7 @@ def confirmation_keyboard(user_id: int):
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="Подтвердить", callback_data=f"confirm:{user_id}"
+                    text="Назначить роль", callback_data=f"assign_role:{user_id}"
                 ),
                 InlineKeyboardButton(
                     text="Отклонить", callback_data=f"reject:{user_id}"
@@ -71,6 +78,22 @@ def confirmation_keyboard(user_id: int):
             ]
         ]
     )
+
+
+# def confirmation_keyboard(user_id: int):
+#     """Клавиатура для подтверждения регистрации"""
+#     return InlineKeyboardMarkup(
+#         inline_keyboard=[
+#             [
+#                 InlineKeyboardButton(
+#                     text="Подтвердить", callback_data=f"confirm:{user_id}"
+#                 ),
+#                 InlineKeyboardButton(
+#                     text="Отклонить", callback_data=f"reject:{user_id}"
+#                 )
+#             ]
+#         ]
+#     )
 
 
 def employee_menu_keyboard() -> InlineKeyboardMarkup | None:

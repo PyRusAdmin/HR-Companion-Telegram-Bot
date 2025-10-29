@@ -5,7 +5,7 @@ from aiogram.types import CallbackQuery
 from aiogram.types import Message
 
 from database.database import Users
-from keyboards.keyboards import back, role_keyboard, departments_keyboard, DEPARTMENTS
+from keyboards.keyboards import back, role_keyboard, departments_keyboard, DEPARTMENTS, role_map
 from states.states import BotContentEditStates
 from system.system import router
 from loguru import logger
@@ -56,11 +56,7 @@ async def add_employee(message: Message, state: FSMContext) -> None:
 @router.callback_query(F.data.startswith("role_"), BotContentEditStates.select_role)
 async def select_role_handler(query: CallbackQuery, state: FSMContext):
     """Обработка выбора роли"""
-    role_map = {
-        "role_hr": "HR",
-        "role_employee": "Сотрудник",
-        "role_admin": "Админ"
-    }
+
     role_key = query.data
     role = role_map.get(role_key)
 
